@@ -19,6 +19,10 @@ function App() {
           Through technology and the creative process, I aim to challenge perspectives, spark curiosity, and craft experiences that inspire thought and discovery.
         </p>
       </section>
+
+      <h1 className="text-3xl underline text-red-500 bg-blue-500">
+            Hello world!  
+      </h1>
       
       <nav className="social-links">
         <a href="https://github.com/sin2" target="_blank" rel="noopener noreferrer">GitHub</a>
