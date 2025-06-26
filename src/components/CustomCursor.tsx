@@ -1,55 +1,108 @@
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
+import styles from './CustomCursor.module.css';
 
-const CustomCursor = () => {
+const prefersReducedMotion =
+  typeof window !== 'undefined' &&
+  window.matchMedia &&
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+interface CustomCursorProps {
+  size?: number;
+  color?: string;
+  animationSpeed?: number; // 0..1 lerp factor
+  disabled?: boolean;
+  style?: React.CSSProperties;
+  className?: string;
+}
+
+const DEFAULT_SIZE = 40;
+const DEFAULT_COLOR = 'rgba(255,255,255,0.10)';
+const DEFAULT_ANIMATION = 0.3;
+
+const CustomCursor: React.FC<CustomCursorProps> = ({
+  size = DEFAULT_SIZE,
+  color = DEFAULT_COLOR,
+  animationSpeed = DEFAULT_ANIMATION,
+  disabled = false,
+  style = {},
+  className = '',
+  ...rest
+}) => {
+  // Early return for mobile, reduced motion, or disabled
+  if (isMobile || prefersReducedMotion || disabled) return null;
+
   const cursorRef = useRef<HTMLDivElement>(null);
   const targetPos = useRef({ x: 0, y: 0 });
   const currentPos = useRef({ x: 0, y: 0 });
-  const animationFrame = useRef<number>(null);
+  const animationFrame = useRef<number | null>(null);
+  const lastUpdate = useRef(0);
+  const [active, setActive] = useState(false);
+  const THROTTLE_MS = 1000 / 60;
 
   useEffect(() => {
-    const moveCursor = (e: MouseEvent) => {
+    const moveCursor = (e: PointerEvent) => {
       targetPos.current.x = e.clientX;
       targetPos.current.y = e.clientY;
     };
-    window.addEventListener('mousemove', moveCursor);
+    window.addEventListener('pointermove', moveCursor, { passive: true });
 
-    // Add hover effect for interactive elements
-    const cursor = cursorRef.current;
-    const activate = () => cursor && cursor.classList.add('cursor-active');
-    const deactivate = () => cursor && cursor.classList.remove('cursor-active');
-    const selectors = 'a, button, input, textarea, select, [tabindex]';
-    const interactiveElements = Array.from(document.querySelectorAll(selectors));
-    interactiveElements.forEach((el) => {
-      el.addEventListener('mouseenter', activate);
-      el.addEventListener('mouseleave', deactivate);
-    });
+    // Event delegation for hover effects
+    const onPointerOver = (e: PointerEvent) => {
+      if ((e.target as Element)?.closest('a, button, input, textarea, select, [tabindex]')) {
+        setActive(true);
+      }
+    };
+    const onPointerOut = (e: PointerEvent) => {
+      if ((e.target as Element)?.closest('a, button, input, textarea, select, [tabindex]')) {
+        setActive(false);
+      }
+    };
+    document.addEventListener('pointerover', onPointerOver);
+    document.addEventListener('pointerout', onPointerOut);
 
+    // Animation loop with throttling
     const lerp = (a: number, b: number, n: number) => a + (b - a) * n;
-    const animate = () => {
-      currentPos.current.x = lerp(currentPos.current.x, targetPos.current.x, 0.18);
-      currentPos.current.y = lerp(currentPos.current.y, targetPos.current.y, 0.18);
-      if (cursorRef.current) {
-        cursorRef.current.style.left = `${currentPos.current.x}px`;
-        cursorRef.current.style.top = `${currentPos.current.y}px`;
+    const animate = (now: number) => {
+      if (now - lastUpdate.current > THROTTLE_MS) {
+        currentPos.current.x = lerp(currentPos.current.x, targetPos.current.x, animationSpeed);
+        currentPos.current.y = lerp(currentPos.current.y, targetPos.current.y, animationSpeed);
+        if (cursorRef.current) {
+          cursorRef.current.style.left = `${currentPos.current.x}px`;
+          cursorRef.current.style.top = `${currentPos.current.y}px`;
+        }
+        lastUpdate.current = now;
       }
       animationFrame.current = requestAnimationFrame(animate);
     };
-    animate();
+    animationFrame.current = requestAnimationFrame(animate);
 
     return () => {
-      window.removeEventListener('mousemove', moveCursor);
-      interactiveElements.forEach((el) => {
-        el.removeEventListener('mouseenter', activate);
-        el.removeEventListener('mouseleave', deactivate);
-      });
+      window.removeEventListener('pointermove', moveCursor);
+      document.removeEventListener('pointerover', onPointerOver);
+      document.removeEventListener('pointerout', onPointerOut);
       if (animationFrame.current) cancelAnimationFrame(animationFrame.current);
     };
-  }, []);
+  }, [animationSpeed]);
 
-  if (isMobile) return null;
+  // Set CSS variables for size and color
+  const cursorVars: React.CSSProperties = {
+    '--cursor-size': `${size}px`,
+    '--cursor-color': color,
+    ...style,
+  } as React.CSSProperties;
 
-  return <div ref={cursorRef} className="custom-cursor" />;
+  return (
+    <div
+      ref={cursorRef}
+      className={[styles.customCursor, active ? styles.active : '', className]
+        .filter(Boolean)
+        .join(' ')}
+      style={cursorVars}
+      aria-hidden
+      {...rest}
+    />
+  );
 };
 
 export default CustomCursor;
