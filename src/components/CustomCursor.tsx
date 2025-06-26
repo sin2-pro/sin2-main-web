@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { isMobile } from 'react-device-detect';
 
 const CustomCursor = () => {
   const cursorRef = useRef<HTMLDivElement>(null);
@@ -45,6 +46,8 @@ const CustomCursor = () => {
       if (animationFrame.current) cancelAnimationFrame(animationFrame.current);
     };
   }, []);
+
+  if (isMobile) return null;
 
   return <div ref={cursorRef} className="custom-cursor" />;
 };

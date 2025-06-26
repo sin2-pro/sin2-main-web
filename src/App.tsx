@@ -41,7 +41,7 @@ function App() {
 
           <div className="flex flex-1 flex-col justify-end">
             <div
-              className={`text-xl self-start flex flex-col items-center select-none pointer-events-none transition-opacity duration-700 ${arrowVisible ? 'opacity-80' : 'opacity-0'}`}
+              className={`text-xl text-green-400 self-start flex flex-col items-center select-none pointer-events-none transition-opacity duration-700 ${arrowVisible ? 'opacity-100' : 'opacity-0'}`}
             >
               <span className="animate-bounce">↓</span>
             </div>
