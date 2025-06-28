@@ -16,6 +16,11 @@ module.exports = {
             },
             a: {
               'font-family': 'Spline Sans Mono',
+              'text-decoration': 'none',
+              transition: 'color 0.2s ease-in-out',
+            },
+            'a:hover': {
+              color: 'rgb(255, 30, 79)',
             },
             h2: {
               'font-family': 'Spline Sans Mono',

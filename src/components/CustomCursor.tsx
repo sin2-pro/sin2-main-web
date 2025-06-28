@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
+import { twMerge } from 'tailwind-merge';
 import styles from './CustomCursor.module.css';
 
 const prefersReducedMotion =
@@ -95,9 +96,7 @@ const CustomCursor: React.FC<CustomCursorProps> = ({
   return (
     <div
       ref={cursorRef}
-      className={[styles.customCursor, active ? styles.active : '', className]
-        .filter(Boolean)
-        .join(' ')}
+      className={twMerge(styles.customCursor, active ? styles.active : '', className)}
       style={cursorVars}
       aria-hidden
       {...rest}

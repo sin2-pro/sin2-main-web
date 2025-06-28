@@ -2,8 +2,10 @@ import { useWindowSize } from 'hamo';
 import './App.css';
 import { IoLogoGithub, IoMail, IoLogoLinkedin, IoArrowDown } from 'react-icons/io5';
 import { useState, useEffect } from 'react';
+import { twMerge } from 'tailwind-merge';
 
 import CustomCursor from './components/CustomCursor';
+import AnimatedLink from './components/AnimatedLink';
 import { ReactLenis, useLenis } from 'lenis/react';
 
 function App() {
@@ -42,14 +44,14 @@ function App() {
             <p>
               <b className="text-accent text-lg">
                 CTO @{' '}
-                <a
-                  className="text-accent"
+                <AnimatedLink
                   href="https://www.gamerlinkapp.com/"
                   target="_blank"
                   rel="noopener"
+                  className="text-accent"
                 >
                   GamerLink Inc.
-                </a>
+                </AnimatedLink>
               </b>
               <br />
               <b>Software Developer and Artist</b>
@@ -59,7 +61,10 @@ function App() {
           </div>
 
           <div
-            className={`fixed bottom-4 left-4 text-3xl text-accent select-none pointer-events-none transition-opacity duration-700 ${arrowVisible ? 'opacity-100' : 'opacity-0'}`}
+            className={twMerge(
+              'fixed bottom-4 left-4 text-3xl text-accent select-none pointer-events-none transition-opacity duration-700',
+              arrowVisible ? 'opacity-100' : 'opacity-0'
+            )}
           >
             <IoArrowDown className="animate-bounce" />
           </div>
@@ -78,29 +83,26 @@ function App() {
           </p>
         </section>
 
-        <nav className="p-4 prose prose-invert grid grid-cols-2 gap-4 md:grid-cols-4 mt-8">
-          <a
+        <nav className="p-4 grid grid-cols-2 gap-4 md:grid-cols-4 mt-8">
+          <AnimatedLink
             href="https://github.com/sin2"
             target="_blank"
             rel="noopener"
-            className="flex flex-row gap-1 items-center"
+            icon={<IoLogoGithub />}
           >
-            <IoLogoGithub />
             sin2
-          </a>
-          <a
+          </AnimatedLink>
+          <AnimatedLink
             href="http://www.linkedin.com/in/ssivapat"
             target="_blank"
             rel="noopener"
-            className="flex flex-row gap-1 items-center"
+            icon={<IoLogoLinkedin />}
           >
-            <IoLogoLinkedin />
             ssivapat
-          </a>
-          <a href="mailto:contact@sin2.ca" className="flex flex-row gap-1 items-center">
-            <IoMail />
+          </AnimatedLink>
+          <AnimatedLink href="mailto:contact@sin2.ca" icon={<IoMail />}>
             contact@sin2.ca
-          </a>
+          </AnimatedLink>
         </nav>
       </main>
     </>
