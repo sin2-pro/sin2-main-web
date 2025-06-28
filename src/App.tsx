@@ -60,14 +60,30 @@ function App() {
             </p>
           </div>
 
-          <div
+          <button
             className={twMerge(
-              'fixed bottom-4 left-4 text-3xl text-accent select-none pointer-events-none transition-opacity duration-700',
-              arrowVisible ? 'opacity-100' : 'opacity-0'
+              'fixed bottom-4 left-4 text-3xl text-accent select-none transition-opacity duration-700 cursor-pointer',
+              arrowVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
             )}
+            onClick={() => {
+              if (lenis) {
+                lenis.scrollTo('bottom', { duration: 2 });
+              }
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                if (lenis) {
+                  lenis.scrollTo('bottom', { duration: 2 });
+                }
+              }
+            }}
+            aria-label="Scroll to bottom of page"
+            aria-hidden={!arrowVisible}
+            disabled={!arrowVisible}
           >
             <IoArrowDown className="animate-bounce" />
-          </div>
+          </button>
         </header>
 
         <section className="p-4 prose prose-invert flex flex-col justify-center" style={{ height }}>
